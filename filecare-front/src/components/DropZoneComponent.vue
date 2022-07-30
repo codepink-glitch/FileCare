@@ -1,0 +1,71 @@
+<template>
+  <div
+      @dragenter.prevent="toggleActive"
+      @dragleave.prevent="toggleActive"
+      @dragover.prevent
+      @drop.prevent="toggleActive"
+      :class="{ 'active-dropzone': active }"
+      class="dropzone">
+    <span>Drag or drop file</span>
+    <span>OR</span>
+    <label for="dropzoneFile">Select file</label>
+    <input type="file" id="dropzoneFile" class="dropzone-file" />
+  </div>
+</template>
+
+<script lang="ts">
+import {defineComponent, ref} from "vue";
+
+export default defineComponent({
+  name: "DropZoneComponent",
+  setup() {
+    const active = ref(false)
+
+    const toggleActive = () => {
+      active.value = !active.value
+    }
+
+    return {active, toggleActive}
+  }
+})
+</script>
+
+<style scoped>
+
+.dropzone {
+  width: 500px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 16px;
+  border: 2px dashed lightblue;
+  background-color: #202425;
+  /*background-color: rgba(70, 78, 91, 0.87);*/
+  transition: 0.3s ease all;
+}
+
+.dropzone > label {
+  padding: 8px 12px;
+  color: rgba(70, 78, 91, 0.87);
+  background-color: lightblue;
+  transition: 0.3s ease all;
+}
+
+.dropzone > input {
+  display: none;
+}
+
+.active-dropzone {
+  color: #fff;
+  border-color: #fff;
+  background-color: rgba(70, 78, 91, 0.87);
+}
+
+.active-dropzone > label {
+  background-color: lightblue;
+  color: rgba(70, 78, 91, 0.87);
+}
+
+</style>
