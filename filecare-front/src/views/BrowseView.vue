@@ -12,7 +12,10 @@
         </div>
         <div v-else-if="popupType === 'file'" class="popup_inner_content">
           <drop-zone-component @drop.prevent="drop" @change="selectedFile" />
-          <span class="file-info">File: {{dropzoneFile.name}}</span>
+          <div style="margin-top: 10px">
+            <span>File: {{dropzoneFile.name}}</span>
+            <button style="float: right">Upload</button>
+          </div>
         </div>
       </popup-component>
     </transition>
@@ -148,12 +151,6 @@ export default defineComponent ({
 </script>
 
 <style scoped>
-
-.file-info {
-  position: relative;
-  top: 5px;
-  left: 30%;
-}
 
 .centerDiv {
   position: absolute;

@@ -42,14 +42,17 @@ export default defineComponent({
   row-gap: 16px;
   border: 2px dashed lightblue;
   background-color: #202425;
-  /*background-color: rgba(70, 78, 91, 0.87);*/
   transition: 0.3s ease all;
 }
 
 .dropzone > label {
-  padding: 8px 12px;
-  color: rgba(70, 78, 91, 0.87);
-  background-color: lightblue;
+  border-radius: 20px;
+  background-color: #4f7cbd;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  margin: 5px;
+  padding: 5px 15px;
   transition: 0.3s ease all;
 }
 
@@ -64,8 +67,13 @@ export default defineComponent({
 }
 
 .active-dropzone > label {
-  background-color: lightblue;
-  color: rgba(70, 78, 91, 0.87);
+  border-radius: 20px;
+  background-color: #4f7cbd;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  margin: 5px;
+  padding: 5px 15px;
 }
 
 </style>
