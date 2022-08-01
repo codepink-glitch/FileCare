@@ -16,7 +16,8 @@ export default {
                 return headers
             })
     },
-    fetch(method: string, endpoint: string, body: string | undefined, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
+    fetch(method: string, endpoint: string, body: any, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
+    // fetch(method: string, endpoint: string, body: string | undefined, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
       if (needAuth) {
           return this.addTokenHeader(headers)
               .then(headers =>
@@ -36,7 +37,7 @@ export default {
     get(endpoint: string, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
         return this.fetch('GET', endpoint, undefined, headers, needAuth)
     },
-    post(endpoint: string, body: string, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
+    post(endpoint: string, body: any, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
         return this.fetch('POST', endpoint, body, headers, needAuth)
     },
     put(endpoint: string, body: string, headers: Headers | undefined, needAuth: boolean): Promise<Response> {

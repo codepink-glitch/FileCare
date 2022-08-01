@@ -14,7 +14,7 @@
           <drop-zone-component @drop.prevent="drop" @change="selectedFile" />
           <div style="margin-top: 10px">
             <span>File: {{dropzoneFile.name}}</span>
-            <button style="float: right">Upload</button>
+            <button class="upload-button" style="float: right" @click="uploadFile">Upload</button>
           </div>
         </div>
       </popup-component>
@@ -33,6 +33,7 @@
               <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
               <img v-else-if="file.extension" width="28" height="28" src="../assets/icons/file.svg" />
               <span style="vertical-align: super">{{ file.name }}</span>
+              <button v-show="file.extension !== 'directory'" class="upload-button download-button-position">download</button>
             </div>
           </th>
         </tr>
@@ -46,7 +47,7 @@ import {defineComponent, ref} from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import api from "@/api";
 import PopupComponent from "@/components/PopupComponent.vue";
-import {PopupType} from "@/interfaces";
+import {FileDetails, PopupType} from "@/interfaces";
 import DropZoneComponent from "@/components/DropZoneComponent.vue";
 
 export default defineComponent ({
@@ -83,6 +84,19 @@ export default defineComponent ({
     this.fetchFolder()
   },
   methods: {
+    uploadFile() {
+      if (this.dropzoneFile.name) {
+        const data: FormData = new FormData()
+        data.append("file", this.dropzoneFile)
+        data.append("folderDetails",
+          JSON.stringify({
+            folder: this.currentFolder,
+            folderName: ""
+        }))
+        api.post("browse/upload", data, undefined, true)
+        // TODO закрытие диалогового окна, сделать лоадер
+      }
+    },
     changeFolder(fileName: string) {
       if (fileName !== "..") {
         this.currentFolder = this.currentFolder ? (this.currentFolder + "/" + fileName) : fileName
@@ -109,7 +123,6 @@ export default defineComponent ({
     },
     closePopup() {
       this.popupShow = false
-      this.dropzoneFile = ref("")
     },
     showCreatePopup(inputType: string) {
       switch(inputType) {
@@ -221,6 +234,21 @@ td, th {
   width: 15%;
   cursor: pointer;
   margin: 5px;
+}
+
+.upload-button {
+  border-radius: 20px;
+  background-color: #4f7cbd;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.download-button-position {
+  float: right;
+  margin-top: 1%;
+  margin-right: 2%;
 }
 
 .v-enter-active {

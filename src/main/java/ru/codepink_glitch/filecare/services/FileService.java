@@ -1,5 +1,7 @@
 package ru.codepink_glitch.filecare.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +33,11 @@ import java.util.stream.Collectors;
 public class FileService {
 
     String PATH;
+    ObjectMapper objectMapper;
 
-    public FileService(@Value("${variables.filePath:#{systemProperties['java.io.tmpdir']}}")String path) {
+    public FileService(@Value("${variables.filePath:#{systemProperties['java.io.tmpdir']}}")String path, ObjectMapper objectMapper) {
         this.PATH = initFolder(path).toString();
+        this.objectMapper = objectMapper;
     }
 
     public Path initFolder(String parentFolder) {
@@ -143,6 +147,20 @@ public class FileService {
     public boolean isDirectoryExists(String path) {
         Path of = Path.of(path);
         return Files.exists(of) && Files.isDirectory(of);
+    }
+
+    public boolean persistFile(UserDetails userDetails, String folderDetails, MultipartFile multipartFile) {
+        try {
+            String username = userDetails.getUsername();
+            FolderDetails folderDetailsObj = objectMapper.readValue(folderDetails, FolderDetails.class);
+            String folder = folderDetailsObj.getFolder();
+            File file =
+                    new File(PATH + "/" + username + (Strings.isNullOrEmpty(folder) ? "" : "/" + folder) + "/" + multipartFile.getOriginalFilename());
+            multipartFile.transferTo(file);
+        } catch (Exception e) {
+            throw new ServiceException(ExceptionsEnum.FILE_UPLOAD_EXCEPTION);
+        }
+        return true;
     }
 
 }
