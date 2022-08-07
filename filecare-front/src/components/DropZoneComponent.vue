@@ -33,8 +33,10 @@ export default defineComponent({
 <style scoped>
 
 .dropzone {
-  width: 500px;
-  height: 200px;
+  /*width: 500px;*/
+  /*height: 200px;*/
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

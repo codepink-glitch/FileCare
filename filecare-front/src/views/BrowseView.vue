@@ -1,8 +1,9 @@
 <template>
   <div>
     <header-component/>
+    <div v-show="loading" style="z-index: 1000; position:absolute; left:53%; top:43%; transform: translate(-50%, 0);"><div class="lds-heart" style="width: 160px; height: 160px;"><div></div></div></div>
     <transition>
-      <popup-component @closePopup="closePopup" v-show="popupShow">
+      <popup-component @closePopup="closePopup" v-show="popupShow" :class="loading ? 'popup-loading' : ''">
         <div v-if="popupType === 'folder'" class="popup_inner_content">
           <span>New directory name: </span>
           <input v-model="newDirectoryName"
@@ -33,7 +34,7 @@
               <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
               <img v-else-if="file.extension" width="28" height="28" src="../assets/icons/file.svg" />
               <span style="vertical-align: super">{{ file.name }}</span>
-              <button v-show="file.extension !== 'directory'" class="upload-button download-button-position">download</button>
+              <button v-show="!!file.extension && file.extension !== 'directory'" class="upload-button download-button-position">download</button>
             </div>
           </th>
         </tr>
@@ -86,6 +87,7 @@ export default defineComponent ({
   methods: {
     uploadFile() {
       if (this.dropzoneFile.name) {
+        this.loading = true
         const data: FormData = new FormData()
         data.append("file", this.dropzoneFile)
         data.append("folderDetails",
@@ -94,7 +96,12 @@ export default defineComponent ({
             folderName: ""
         }))
         api.post("browse/upload", data, undefined, true)
-        // TODO закрытие диалогового окна, сделать лоадер
+            .catch(console.log) // TODO человеческая обрабока ошибки
+            .finally(() => {
+              this.loading = false
+              this.fetchFolder()
+              this.closePopup()
+            })
       }
     },
     changeFolder(fileName: string) {
@@ -249,6 +256,10 @@ td, th {
   float: right;
   margin-top: 1%;
   margin-right: 2%;
+}
+
+.popup-loading {
+  filter: blur(2px);
 }
 
 .v-enter-active {
