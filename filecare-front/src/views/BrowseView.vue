@@ -20,21 +20,24 @@
         </div>
       </popup-component>
     </transition>
-    <div class="centerDiv rounded-border">
+    <div class="centerDiv rounded-border" style="padding-top: 0;">
       <table>
         <tr>
-          <th class="borderlessTh">
-            <img @click="showCreatePopup('folder')" style="cursor: pointer; float: right" width="28" height="28" src = "../assets/icons/add_folder.svg"/>
-            <img @click="showCreatePopup('file')" style="cursor: pointer; float: right" width="28" height="28" src="../assets/icons/add_file.svg"/>
+          <th class="borderlessTh buttons-div-position">
+            <img @click="showCreatePopup('folder')" class="cursor-pointer" style="float: right" width="28" height="28" src = "../assets/icons/add_folder.svg"/>
+            <img @click="showCreatePopup('file')" class="cursor-pointer" style="float: right" width="28" height="28" src="../assets/icons/add_file.svg"/>
           </th>
         </tr>
         <tr v-for="(file) in filesArr" :key="file.path">
           <th>
-            <div style="cursor: pointer" @click="changeFolder(file.name)">
+            <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''" @click="changeFolder(file)">
               <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
               <img v-else-if="file.extension" width="28" height="28" src="../assets/icons/file.svg" />
               <span style="vertical-align: super">{{ file.name }}</span>
-              <button v-show="!!file.extension && file.extension !== 'directory'" class="upload-button download-button-position">download</button>
+              <div class="buttons-div-position">
+                <img v-show="!!file.extension && file.extension !== 'directory'" class="cursor-pointer" width="27" height="27" src="../assets/icons/download.svg"/>
+                <img v-show="file.name !== '..'" class="cursor-pointer" width="27" height="27" src="../assets/icons/delete.svg"/>
+              </div>
             </div>
           </th>
         </tr>
@@ -56,7 +59,7 @@ export default defineComponent ({
   components: {DropZoneComponent, PopupComponent, HeaderComponent},
   data() {
     return {
-      filesArr: [{name: ".."}],
+      filesArr: [{name: "..", extension: "directory"}],
       loading: false,
       popupShow: false,
       currentFolder: "",
@@ -104,22 +107,26 @@ export default defineComponent ({
             })
       }
     },
-    changeFolder(fileName: string) {
-      if (fileName !== "..") {
-        this.currentFolder = this.currentFolder ? (this.currentFolder + "/" + fileName) : fileName
-      } else {
-        const folderArr = this.currentFolder.split("/")
-        folderArr.splice(-1)
-        this.currentFolder = folderArr.join("/")
+    changeFolder(file: FileDetails) {
+      console.log('changeFolder')
+      console.log(file)
+      if(file.extension === 'directory') {
+        if (file.name !== '..') {
+          this.currentFolder = this.currentFolder ? (this.currentFolder + '/' + file.name) : file.name
+        } else {
+          const folderArr = this.currentFolder.split('/')
+          folderArr.splice(-1)
+          this.currentFolder = folderArr.join('/')
+        }
+        this.fetchFolder()
       }
-      this.fetchFolder()
     },
     fetchFolder() {
       this.loading = true
       if (this.currentFolder) {
         api.post("browse/folder", JSON.stringify({folder: this.currentFolder}),new Headers({'Content-Type': 'application/json'}), true)
             .then(response => response.json())
-            .then(body => this.filesArr = [{name: ".."}].concat(body))
+            .then(body => this.filesArr = [{name: "..", extension: "directory"}].concat(body))
             .finally(() => this.loading = false)
       } else {
         api.get("browse/initial", undefined, true)
@@ -254,7 +261,11 @@ td, th {
 
 .download-button-position {
   float: right;
-  margin-top: 1%;
+  margin-right: 2%;
+}
+
+.buttons-div-position {
+  float: right;
   margin-right: 2%;
 }
 
