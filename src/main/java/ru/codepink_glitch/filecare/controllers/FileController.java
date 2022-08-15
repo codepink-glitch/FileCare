@@ -46,7 +46,12 @@ public class FileController {
     public ResponseEntity<Boolean> uploadFile(@AuthenticationPrincipal UserDetails userDetails,
                                               @RequestParam("folderDetails") String folderDetails,
                                               @RequestParam("file") MultipartFile file) {
-//        return new ResponseEntity<>(true, HttpStatus.OK);
         return new ResponseEntity<>(fileService.persistFile(userDetails, folderDetails, file), HttpStatus.OK);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<Boolean> deleteFile(@AuthenticationPrincipal UserDetails userDetails,
+                                              @RequestBody FileDisplay file) {
+        return new ResponseEntity<>(fileService.delete(userDetails, file), HttpStatus.OK);
     }
 }

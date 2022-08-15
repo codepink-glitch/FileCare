@@ -3,12 +3,14 @@ package ru.codepink_glitch.filecare.dto;
 import com.google.common.io.Files;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.io.File;
 
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileDisplay {
 
     String name;

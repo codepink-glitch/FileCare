@@ -97,28 +97,46 @@ public class FileService {
         return new byte[0];
     }
 
-    public boolean saveFile(MultipartFile uploadedFile, String folder) {
-        try {
-            File targetFolder = new File(folder);
-
-            if (!targetFolder.isDirectory() || !targetFolder.exists()) {
-                throw new ServiceException(ExceptionsEnum.NOT_A_DIRECTORY);
-            }
-
-            File targetFile = new File(targetFolder.getAbsolutePath() + "/" + uploadedFile.getOriginalFilename());
-            uploadedFile.transferTo(targetFile);
-        } catch (IOException e) {
-            throw new ServiceException(ExceptionsEnum.FILE_UPLOAD_EXCEPTION);
-        }
-        return true;
-    }
-
     public boolean removeFile(String path) {
         File targetFile = new File(path);
         if (!targetFile.exists()) {
             throw new ServiceException(ExceptionsEnum.FILE_NOT_FOUND);
         }
         return targetFile.delete();
+    }
+
+    public boolean recursivelyDeleteFolder(String path) {
+        File targetFolder = new File(path);
+        if (!targetFolder.isDirectory() || !targetFolder.exists())
+            throw new ServiceException(ExceptionsEnum.FILE_NOT_FOUND);
+
+        File[] folderFiles = targetFolder.listFiles();
+        if (Objects.isNull(folderFiles))
+            throw new ServiceException(ExceptionsEnum.FILE_NOT_FOUND);
+
+        for (File file: folderFiles) {
+            if (file.isDirectory())
+                recursivelyDeleteFolder(file.getAbsolutePath());
+            else
+                file.delete();
+        }
+
+        targetFolder.delete();
+
+        return true;
+    }
+
+    public boolean delete(UserDetails userDetails, FileDisplay file) {
+        File target = new File(PATH + "/" + userDetails.getUsername() + "/" + file.getPath() + "/" + file.getName());
+
+        if (!target.exists())
+            throw new ServiceException(ExceptionsEnum.FILE_NOT_FOUND);
+        if (target.isDirectory())
+            recursivelyDeleteFolder(target.getAbsolutePath());
+        else
+            target.delete();
+
+        return true;
     }
 
     public boolean moveFile(String initialPath, String targetPath) {

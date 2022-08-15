@@ -23,20 +23,24 @@
     <div class="centerDiv rounded-border" style="padding-top: 0;">
       <table>
         <tr>
-          <th class="borderlessTh buttons-div-position">
+          <th class="th-bottom-border buttons-div-position">
             <img @click="showCreatePopup('folder')" class="cursor-pointer" style="float: right" width="28" height="28" src = "../assets/icons/add_folder.svg"/>
             <img @click="showCreatePopup('file')" class="cursor-pointer" style="float: right" width="28" height="28" src="../assets/icons/add_file.svg"/>
           </th>
         </tr>
         <tr v-for="(file) in filesArr" :key="file.path">
-          <th>
-            <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''" @click="changeFolder(file)">
-              <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
-              <img v-else-if="file.extension" width="28" height="28" src="../assets/icons/file.svg" />
-              <span style="vertical-align: super">{{ file.name }}</span>
-              <div class="buttons-div-position">
+          <th class="th-bottom-border">
+            <div>
+<!--            <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''">-->
+              <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''"
+                   style="display: inline-block;" @click="changeFolder(file)">
+                <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
+                <img v-else-if="file.extension" width="28" height="28" src="../assets/icons/file.svg" />
+                <span style="vertical-align: super">{{ file.name }}</span>
+              </div>
+              <div class="buttons-div-position" style="display: inline-block;">
                 <img v-show="!!file.extension && file.extension !== 'directory'" class="cursor-pointer" width="27" height="27" src="../assets/icons/download.svg"/>
-                <img v-show="file.name !== '..'" class="cursor-pointer" width="27" height="27" src="../assets/icons/delete.svg"/>
+                <img v-show="file.name !== '..'" @click="deleteFile(file)" class="cursor-pointer" width="27" height="27" src="../assets/icons/delete.svg"/>
               </div>
             </div>
           </th>
@@ -108,8 +112,6 @@ export default defineComponent ({
       }
     },
     changeFolder(file: FileDetails) {
-      console.log('changeFolder')
-      console.log(file)
       if(file.extension === 'directory') {
         if (file.name !== '..') {
           this.currentFolder = this.currentFolder ? (this.currentFolder + '/' + file.name) : file.name
@@ -121,10 +123,15 @@ export default defineComponent ({
         this.fetchFolder()
       }
     },
+    deleteFile(file: FileDetails) {
+      const body: string = JSON.stringify({name: file.name, path: this.currentFolder})
+      api.post("browse/delete", body, new Headers({'Content-Type': 'application/json'}), true)
+          .then(() => this.fetchFolder())
+    },
     fetchFolder() {
       this.loading = true
       if (this.currentFolder) {
-        api.post("browse/folder", JSON.stringify({folder: this.currentFolder}),new Headers({'Content-Type': 'application/json'}), true)
+        api.post("browse/folder", JSON.stringify({folder: this.currentFolder}), new Headers({'Content-Type': 'application/json'}), true)
             .then(response => response.json())
             .then(body => this.filesArr = [{name: "..", extension: "directory"}].concat(body))
             .finally(() => this.loading = false)
@@ -267,6 +274,11 @@ td, th {
 .buttons-div-position {
   float: right;
   margin-right: 2%;
+}
+
+.th-bottom-border {
+  border: none;
+  border-bottom: 2px solid #4f7cbd;
 }
 
 .popup-loading {

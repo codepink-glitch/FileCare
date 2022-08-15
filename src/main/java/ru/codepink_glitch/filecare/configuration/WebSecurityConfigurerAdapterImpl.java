@@ -60,7 +60,7 @@ public class WebSecurityConfigurerAdapterImpl extends WebSecurityConfigurerAdapt
         return new BCryptPasswordEncoder();
     }
 
-    // idk why it's verifying token two times so i disable one of it
+    // Spring automatically add all registered filters as beans, so i disable one
 
     @Bean
     public FilterRegistrationBean<AuthenticationFilter> jwtRequestFilterRegistration(AuthenticationFilter authenticationFilter) {

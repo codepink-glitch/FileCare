@@ -43,8 +43,8 @@ export default {
     put(endpoint: string, body: string, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
         return this.fetch('PUT', endpoint, body, headers, needAuth)
     },
-    delete(endpoint: string, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
-        return this.fetch('DELETE', endpoint, undefined, headers, needAuth)
+    delete(endpoint: string, body: any, headers: Headers | undefined, needAuth: boolean): Promise<Response> {
+        return this.fetch('DELETE', endpoint, body, headers, needAuth)
     },
 
     obtainUserDetails(): UserDetails | null {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-show="loading" style="z-index: 100; position:absolute; left:50%; top:43%; transform: translate(-50%, 0);"><div class="lds-heart"><div></div></div></div>
-      <div :class="loading ? 'blur centerDiv rounded-border' : shaking ? 'shake centerDiv rounded-border' : 'centerDiv rounded-border'">
+      <div style="padding-top: 20px" :class="loading ? 'blur centerDiv rounded-border' : shaking ? 'shake centerDiv rounded-border' : 'centerDiv rounded-border'">
       <div class="grid-div inner-padding">
         <span>login: </span>
         <input v-model="authenticationRequest.username"
