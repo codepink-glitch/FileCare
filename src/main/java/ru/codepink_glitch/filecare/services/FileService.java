@@ -14,9 +14,8 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -179,6 +178,20 @@ public class FileService {
             throw new ServiceException(ExceptionsEnum.FILE_UPLOAD_EXCEPTION);
         }
         return true;
+    }
+
+    public void downloadFile(UserDetails user, FileDisplay file, HttpServletResponse response) {
+        File target = new File(PATH + "/" + user.getUsername() + "/" + file.getPath() + "/" + file.getName());
+
+        try {
+            InputStream targetStream = new DataInputStream(new FileInputStream(target));
+            IOUtils.copy(targetStream, response.getOutputStream());
+            response.flushBuffer();
+        } catch (FileNotFoundException e) {
+            throw new ServiceException(ExceptionsEnum.FILE_NOT_FOUND);
+        } catch (Exception e) {
+            throw new ServiceException(ExceptionsEnum.FILE_DOWNLOAD_EXCETPION);
+        }
     }
 
 }

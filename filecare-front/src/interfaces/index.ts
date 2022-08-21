@@ -11,5 +11,6 @@ export interface FileDetails {
 
 export enum PopupType {
     UPLOAD_FILE = 'file',
-    CREATE_FOLDER = 'folder'
+    CREATE_FOLDER = 'folder',
+    DELETE = 'delete'
 }

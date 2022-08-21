@@ -15,6 +15,7 @@ import ru.codepink_glitch.filecare.dto.FileDisplay;
 import ru.codepink_glitch.filecare.dto.FolderDetails;
 import ru.codepink_glitch.filecare.services.FileService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -54,4 +55,12 @@ public class FileController {
                                               @RequestBody FileDisplay file) {
         return new ResponseEntity<>(fileService.delete(userDetails, file), HttpStatus.OK);
     }
+
+    @PostMapping("/download")
+    public void downloadFile(@AuthenticationPrincipal UserDetails user,
+                             @RequestBody FileDisplay file,
+                             HttpServletResponse response) {
+        fileService.downloadFile(user, file, response);
+    }
+
 }

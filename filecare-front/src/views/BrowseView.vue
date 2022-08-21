@@ -18,6 +18,13 @@
             <button class="upload-button" style="float: right" @click="uploadFile">Upload</button>
           </div>
         </div>
+        <div v-else-if="popupType === 'delete'" class="popup_inner_content" style="text-align: center">
+          <span>Delete file/folder?</span>
+          <div style="margin-top: 1%">
+            <button @click="deleteFile" class="create-button">Delete</button>
+            <button @click="closePopup" class="create-button">Cancel</button>
+          </div>
+        </div>
       </popup-component>
     </transition>
     <div class="centerDiv rounded-border" style="padding-top: 0;">
@@ -31,7 +38,6 @@
         <tr v-for="(file) in filesArr" :key="file.path">
           <th class="th-bottom-border">
             <div>
-<!--            <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''">-->
               <div :class="file.extension === 'directory' || file.name === '..' ? 'cursor-pointer' : ''"
                    style="display: inline-block;" @click="changeFolder(file)">
                 <img v-if="file.extension === 'directory'" width="28" height="28" src="../assets/icons/folder.svg" />
@@ -39,8 +45,8 @@
                 <span style="vertical-align: super">{{ file.name }}</span>
               </div>
               <div class="buttons-div-position" style="display: inline-block;">
-                <img v-show="!!file.extension && file.extension !== 'directory'" class="cursor-pointer" width="27" height="27" src="../assets/icons/download.svg"/>
-                <img v-show="file.name !== '..'" @click="deleteFile(file)" class="cursor-pointer" width="27" height="27" src="../assets/icons/delete.svg"/>
+                <img v-show="!!file.extension && file.extension !== 'directory'" @click="downloadFile(file)" class="cursor-pointer" width="27" height="27" src="../assets/icons/download.svg"/>
+                <img v-show="file.name !== '..'" @click="showDeletePopup(file)" class="cursor-pointer" width="27" height="27" src="../assets/icons/delete.svg"/>
               </div>
             </div>
           </th>
@@ -70,6 +76,7 @@ export default defineComponent ({
       newDirectoryName: "",
       newDirectoryNameValid: true,
       popupType: PopupType.CREATE_FOLDER,
+      fileForDeletion: {extension: "", name: "", path: ""}
     }
   },
   setup() {
@@ -123,10 +130,16 @@ export default defineComponent ({
         this.fetchFolder()
       }
     },
-    deleteFile(file: FileDetails) {
-      const body: string = JSON.stringify({name: file.name, path: this.currentFolder})
+    showDeletePopup(file: FileDetails) {
+      this.popupShow = true
+      this.popupType = PopupType.DELETE
+      this.fileForDeletion = file
+    },
+    deleteFile() {
+      const body: string = JSON.stringify({name: this.fileForDeletion.name, path: this.currentFolder})
       api.post("browse/delete", body, new Headers({'Content-Type': 'application/json'}), true)
           .then(() => this.fetchFolder())
+          .finally(() => this.closePopup())
     },
     fetchFolder() {
       this.loading = true
@@ -143,6 +156,7 @@ export default defineComponent ({
       }
     },
     closePopup() {
+      this.fileForDeletion = {name: "", extension: "", path: ""}
       this.popupShow = false
     },
     showCreatePopup(inputType: string) {
@@ -179,6 +193,27 @@ export default defineComponent ({
             this.newDirectoryName = ""
             this.newDirectoryNameValid = true
           })
+    },
+    downloadFile(file: FileDetails) {
+      file.path = this.currentFolder
+      const body: string | undefined = JSON.stringify(file);
+      const headers: Headers = new Headers({'Content-Type': 'application/json'})
+      api.post("browse/download", body, headers, true)
+          .then((response) => response.blob().then((blob) => {
+            const a = document.createElement("a")
+            a.href = URL.createObjectURL(blob)
+            a.setAttribute("download", file.name)
+            a.click()
+          }))
+      // fetch(url).then(function(t) {
+      //   return t.blob().then((b)=>{
+      //         var a = document.createElement("a");
+      //         a.href = URL.createObjectURL(b);
+      //         a.setAttribute("download", filename);
+      //         a.click();
+      //       }
+      //   );
+      // });
     }
   }
 })
