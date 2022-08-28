@@ -39,8 +39,6 @@ public class WebSecurityConfigurerAdapterImpl extends WebSecurityConfigurerAdapt
                 .antMatchers("/authentication").permitAll()
                 .antMatchers("/registration").permitAll()
                 .antMatchers("/registration/**").permitAll()
-                // TODO delete this line and disable h2 console
-                .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.headers().frameOptions().disable();

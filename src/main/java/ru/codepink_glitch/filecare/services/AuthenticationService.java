@@ -1,8 +1,10 @@
 package ru.codepink_glitch.filecare.services;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.codepink_glitch.filecare.db.entities.UserDetailsImpl;
 import ru.codepink_glitch.filecare.dto.AuthenticationRequest;
 import ru.codepink_glitch.filecare.dto.AuthenticationResponse;
+import ru.codepink_glitch.filecare.dto.TokenVerificationRequest;
 import ru.codepink_glitch.filecare.exceptions.ExceptionsEnum;
 import ru.codepink_glitch.filecare.exceptions.ServiceException;
 import lombok.AccessLevel;
@@ -12,6 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,10 @@ public class AuthenticationService {
 
         UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         return new AuthenticationResponse(tokenService.generateToken(userDetails));
+    }
+
+    public boolean isTokenValid(UserDetails userDetails, TokenVerificationRequest request) {
+        return tokenService.validateToken(request.token(), userDetails);
     }
 
 }

@@ -1,7 +1,10 @@
 package ru.codepink_glitch.filecare.controllers;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.codepink_glitch.filecare.dto.AuthenticationRequest;
 import ru.codepink_glitch.filecare.dto.AuthenticationResponse;
+import ru.codepink_glitch.filecare.dto.TokenVerificationRequest;
 import ru.codepink_glitch.filecare.services.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +27,11 @@ public class AuthenticationController {
     @PostMapping
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
+    }
+
+    @PostMapping("/isTokenValid")
+    public ResponseEntity<Boolean> isTokenExpired(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @RequestBody TokenVerificationRequest request) {
+        return new ResponseEntity<>(authenticationService.isTokenValid(userDetails, request), HttpStatus.OK);
     }
 }

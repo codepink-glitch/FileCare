@@ -56,6 +56,11 @@ export default {
         }
     },
 
+    async checkTokenValidity(token: string | null): Promise<boolean> {
+        return this.post('authentication/isTokenValid', JSON.stringify({token: token}), undefined, false)
+            .then(response => response.json())
+    },
+
     async obtainToken(): Promise<string> {
         const localToken: string | null = localStorage.getItem('filecare-token')
 
